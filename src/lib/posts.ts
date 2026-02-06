@@ -26,6 +26,7 @@ import {
   Timestamp,
   limit,
   where,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import type { Post, PostInput, PostSummary, User, Category } from "../types";
@@ -196,5 +197,98 @@ export async function getPostsByCategory(
       authorDisplayName: data.authorDisplayName,
       createdAt: data.createdAt,
     };
+  });
+}
+
+/**
+ * 옵션 기반 게시글 조회 (TanStack Query용)
+ *
+ * 카테고리 필터와 개수 제한을 옵션으로 받아 처리합니다.
+ *
+ * @param options - 조회 옵션 (category, limitCount)
+ * @returns 게시글 목록과 메타 정보
+ */
+export async function getPostsWithOptions(
+  options: { category?: Category | null; limitCount?: number } = {},
+): Promise<{ posts: PostSummary[] }> {
+  const { category = null, limitCount = 20 } = options;
+
+  let posts: PostSummary[];
+
+  if (category) {
+    posts = await getPostsByCategory(category, limitCount);
+  } else {
+    posts = await getPosts(limitCount);
+  }
+
+  return { posts };
+}
+
+/**
+ * 게시글 목록 실시간 구독
+ *
+ * 데이터가 변경되면 자동으로 callback이 호출됩니다.
+ *
+ * @param callback - 데이터 변경 시 호출될 함수
+ * @param options - 조회 옵션
+ * @returns 구독 해제 함수
+ */
+export function subscribeToPostsRealtime(
+  callback: (posts: PostSummary[]) => void,
+  options: { category?: Category | null; limitCount?: number } = {},
+): () => void {
+  const { category = null, limitCount = 20 } = options;
+
+  const constraints = [];
+
+  if (category) {
+    constraints.push(where("category", "==", category));
+  }
+
+  constraints.push(orderBy("createdAt", "desc"));
+  constraints.push(limit(limitCount));
+
+  const q = query(postsCollection, ...constraints);
+
+  // onSnapshot은 구독 해제 함수를 반환
+  return onSnapshot(q, (snapshot) => {
+    const posts = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        title: data.title,
+        category: data.category,
+        authorEmail: data.authorEmail,
+        authorDisplayName: data.authorDisplayName,
+        createdAt: data.createdAt,
+      };
+    });
+
+    callback(posts);
+  });
+}
+
+/**
+ * 단일 게시글 실시간 구독
+ *
+ * @param postId - 게시글 ID
+ * @param callback - 데이터 변경 시 호출될 함수
+ * @returns 구독 해제 함수
+ */
+export function subscribeToPostRealtime(
+  postId: string,
+  callback: (post: Post | null) => void,
+): () => void {
+  const docRef = doc(db, "posts", postId);
+
+  return onSnapshot(docRef, (snapshot) => {
+    if (snapshot.exists()) {
+      callback({
+        id: snapshot.id,
+        ...snapshot.data(),
+      } as Post);
+    } else {
+      callback(null);
+    }
   });
 }
