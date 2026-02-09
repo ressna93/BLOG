@@ -1,10 +1,3 @@
-/**
- * 게시글 카드 컴포넌트
- *
- * Day 1 컴포넌트 구조도: HomePage > PostList > PostCard
- * Day 1 기능명세서 FUNC-003 표시 데이터 참고
- */
-
 import { Link } from "react-router-dom";
 import type { PostSummary } from "@/types";
 import { CATEGORY_LABELS } from "@/types";
@@ -14,11 +7,6 @@ interface PostCardProps {
 }
 
 function PostCard({ post }: PostCardProps) {
-  /**
-   * 날짜 포맷팅 - 이후 utils 폴더에 따로 구성
-   *
-   * Day 1 기능명세서: 작성일 YYYY.MM.DD 형식
-   */
   const formatDate = (timestamp: { toDate: () => Date }) => {
     const date = timestamp.toDate();
     return date.toLocaleDateString("ko-KR", {
@@ -28,11 +16,6 @@ function PostCard({ post }: PostCardProps) {
     });
   };
 
-  /**
-   * 작성자 표시
-   *
-   * Day 1 기능명세서: 작성자 이메일 @ 앞부분
-   */
   const getAuthorName = () => {
     if (post.authorDisplayName) {
       return post.authorDisplayName;
@@ -41,7 +24,7 @@ function PostCard({ post }: PostCardProps) {
   };
 
   return (
-    <article className="bg-white rounded-lg shadow hover:shadow-md transition-shadow">
+    <article className="card">
       <Link to={`/posts/${post.id}`} className="block p-6">
         {/* 카테고리 태그 */}
         {post.category && (
@@ -54,12 +37,12 @@ function PostCard({ post }: PostCardProps) {
         )}
 
         {/* 제목 (Day 1: 최대 50자, 초과 시 "..." 처리) */}
-        <h2 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+        <h2 className="text-lg font-semibold mb-2 line-clamp-2">
           {post.title}
         </h2>
 
         {/* 메타 정보 */}
-        <div className="flex items-center text-sm text-gray-500 gap-2">
+        <div className="flex items-center text-sm text-muted-foreground gap-2">
           <span>{getAuthorName()}</span>
           <span>·</span>
           <span>{formatDate(post.createdAt)}</span>

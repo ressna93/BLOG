@@ -27,7 +27,7 @@ export function usePosts(options: UsePostsOptions = {}) {
     queryFn: async () => {
       const result = await getPostsWithOptions({
         category,
-        limitCount: 20,
+        limitCount: 5,
       });
       return result.posts;
     },

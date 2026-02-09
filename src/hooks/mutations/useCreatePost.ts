@@ -1,15 +1,8 @@
-// src/hooks/mutations/useCreatePost.ts
-
-/**
- * 게시글 작성 뮤테이션
- *
- * Day 1 요구사항: POST-001
- */
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createPost } from "@/lib/posts";
-import { queryKeys } from "@/hooks/queries";
+import { queryKeys } from "@/hooks/queries/queriesKeys";
 import type { PostInput, User } from "@/types";
+import { toast } from "sonner";
 
 interface CreatePostVariables {
   input: PostInput;
@@ -20,15 +13,17 @@ export function useCreatePost() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    // 뮤테이션 함수
     mutationFn: ({ input, user }: CreatePostVariables) =>
       createPost(input, user),
 
-    // 성공 시 게시글 목록 캐시 무효화
     onSuccess: () => {
+      toast.success("새 글이 등록되었습니다");
       queryClient.invalidateQueries({
         queryKey: queryKeys.posts.lists(),
       });
+    },
+    onError: () => {
+      toast.error("글 등록에 실패했습니다");
     },
   });
 }

@@ -27,6 +27,9 @@ import {
   limit,
   where,
   onSnapshot,
+  startAfter,
+  type QueryDocumentSnapshot,
+  type DocumentData,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import type { Post, PostInput, PostSummary, User, Category } from "../types";
@@ -80,9 +83,7 @@ export async function createPost(
  * @param limitCount - 조회할 게시글 수 (기본값: 20)
  * @returns 게시글 요약 목록
  */
-export async function getPosts(
-  limitCount: number = 20,
-): Promise<PostSummary[]> {
+export async function getPosts(limitCount: number = 5): Promise<PostSummary[]> {
   // 최신순 정렬 쿼리
   const q = query(
     postsCollection,
@@ -201,27 +202,69 @@ export async function getPostsByCategory(
 }
 
 /**
+ * 페이지네이션 결과 타입
+ */
+export interface GetPostsResult {
+  posts: PostSummary[];
+  lastDoc: QueryDocumentSnapshot<DocumentData> | null;
+  hasMore: boolean;
+}
+
+/**
  * 옵션 기반 게시글 조회 (TanStack Query용)
  *
- * 카테고리 필터와 개수 제한을 옵션으로 받아 처리합니다.
+ * 카테고리 필터와 커서 기반 페이지네이션을 지원합니다.
  *
- * @param options - 조회 옵션 (category, limitCount)
- * @returns 게시글 목록과 메타 정보
+ * @param options - 조회 옵션 (category, limitCount, lastDoc)
+ * @returns 게시글 목록과 페이지네이션 메타 정보
  */
 export async function getPostsWithOptions(
-  options: { category?: Category | null; limitCount?: number } = {},
-): Promise<{ posts: PostSummary[] }> {
-  const { category = null, limitCount = 20 } = options;
+  options: {
+    category?: Category | null;
+    limitCount?: number;
+    lastDoc?: QueryDocumentSnapshot<DocumentData> | null;
+  } = {},
+): Promise<GetPostsResult> {
+  const { category = null, limitCount = 20, lastDoc = null } = options;
 
-  let posts: PostSummary[];
+  const constraints = [];
 
   if (category) {
-    posts = await getPostsByCategory(category, limitCount);
-  } else {
-    posts = await getPosts(limitCount);
+    constraints.push(where("category", "==", category));
   }
 
-  return { posts };
+  constraints.push(orderBy("createdAt", "desc"));
+
+  if (lastDoc) {
+    constraints.push(startAfter(lastDoc));
+  }
+
+  // 다음 페이지 여부 확인을 위해 1개 더 요청
+  constraints.push(limit(limitCount + 1));
+
+  const q = query(postsCollection, ...constraints);
+  const snapshot = await getDocs(q);
+
+  const hasMore = snapshot.docs.length > limitCount;
+  const docs = hasMore ? snapshot.docs.slice(0, limitCount) : snapshot.docs;
+
+  const posts = docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      title: data.title,
+      category: data.category,
+      authorEmail: data.authorEmail,
+      authorDisplayName: data.authorDisplayName,
+      createdAt: data.createdAt,
+    };
+  });
+
+  return {
+    posts,
+    lastDoc: docs.length > 0 ? docs[docs.length - 1] : null,
+    hasMore,
+  };
 }
 
 /**

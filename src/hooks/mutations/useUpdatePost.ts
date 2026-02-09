@@ -1,15 +1,8 @@
-// src/hooks/mutations/useUpdatePost.ts
-
-/**
- * 게시글 수정 뮤테이션
- *
- * Day 1 요구사항: POST-004
- */
-
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updatePost } from "@/lib/posts";
-import { queryKeys } from "@/hooks/queries";
+import { queryKeys } from "@/hooks/queries/queriesKeys";
 import type { PostInput } from "@/types";
+import { toast } from "sonner";
 
 interface UpdatePostVariables {
   postId: string;
@@ -25,6 +18,7 @@ export function useUpdatePost() {
 
     // 성공 시 해당 게시글 캐시 무효화
     onSuccess: (_, { postId }) => {
+      toast.success("글이 수정되었습니다");
       // 상세 페이지 캐시 무효화
       queryClient.invalidateQueries({
         queryKey: queryKeys.posts.detail(postId),
@@ -33,6 +27,10 @@ export function useUpdatePost() {
       queryClient.invalidateQueries({
         queryKey: queryKeys.posts.lists(),
       });
+    },
+    // 오류 처리
+    onError: () => {
+      toast.error("글 수정에 실패했습니다");
     },
   });
 }
