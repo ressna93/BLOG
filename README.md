@@ -7,17 +7,17 @@
 
 ## 🌐 Demo
 
-**Live Demo**: [https://my-dev-blog-xxx.vercel.app](https://my-dev-blog-xxx.vercel.app)
+**Live Demo**: [https://dev-blog-sna.web.app/](https://dev-blog-sna.web.app/)
 
 ## 📸 Screenshots
 
 | 홈 (라이트)                               | 홈 (다크)                               |
 | ----------------------------------------- | --------------------------------------- |
-| ![Home Light](screenshots/home-light.png) | ![Home Dark](screenshots/home-dark.png) |
+| ![Home Light](docs/screenshots/light.png) | ![Home Dark](docs/screenshots/dark.png) |
 
-| 글쓰기                          | 로그인                          |
-| ------------------------------- | ------------------------------- |
-| ![Write](screenshots/write.png) | ![Login](screenshots/login.png) |
+| 글쓰기                               | 로그인                               |
+| ------------------------------------ | ------------------------------------ |
+| ![Write](docs/screenshots/write.png) | ![Login](docs/screenshots/Login.png) |
 
 ## ✨ Features
 
@@ -176,12 +176,12 @@ service cloud.firestore {
 
 ## 🎯 Future Improvements
 
-- [ ] 댓글 기능
-- [ ] 좋아요/북마크
-- [ ] 이미지 업로드 (Firebase Storage)
-- [ ] 마크다운 에디터
-- [ ] 검색 기능
-- [ ] 사용자 프로필 페이지
+- [x] 댓글 기능
+- [x] 좋아요/북마크
+- [x] 이미지 업로드 (Firebase Storage)
+- [x] 마크다운 에디터
+- [x] 검색 기능
+- [x] 사용자 프로필 페이지
 - [ ] 팔로우/팔로잉
 
 ## 🤝 Contributing
@@ -200,8 +200,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Your Name**
 
-- GitHub: [@yourusername](https://github.com/yourusername)
-- Email: your.email@example.com
+- GitHub: [@youngjongKim](https://github.com/ressna93/)
+- Email: umaru19930407@gmail.com
 
 ## 🙏 Acknowledgments
 
