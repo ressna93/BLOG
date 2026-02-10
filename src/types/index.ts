@@ -59,6 +59,7 @@ export interface Post {
   authorDisplayName: string | null;
   createdAt: Timestamp;
   updatedAt: Timestamp;
+  likeCount: number;
 }
 
 /**
@@ -86,6 +87,7 @@ export interface PostSummary {
   authorDisplayName: string | null;
   createdAt: Timestamp;
   thumbnailUrl?: string;
+  likeCount: number;
 }
 
 // ============================================
@@ -138,4 +140,45 @@ export interface ApiResponse<T> {
   success: boolean;
   data?: T;
   error?: string;
+}
+
+// ============================================
+// Comment (댓글)
+// ============================================
+
+/**
+ * 댓글 타입
+ */
+export interface Comment {
+  /** Firestore 문서 ID */
+  id: string;
+
+  /** 댓글이 속한 게시글 ID */
+  postId: string;
+
+  /** 댓글 내용 */
+  content: string;
+
+  /** 작성자 Firebase Auth UID */
+  authorId: string;
+
+  /** 작성자 이메일 */
+  authorEmail: string;
+
+  /** 작성자 표시 이름 */
+  authorDisplayName: string | null;
+
+  /** 생성 시각 */
+  createdAt: Timestamp;
+
+  /** 수정 시각 */
+  updatedAt: Timestamp;
+}
+
+/**
+ * 댓글 작성/수정 시 입력 데이터 타입
+ */
+export interface CommentInput {
+  /** 댓글 내용 */
+  content: string;
 }
