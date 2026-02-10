@@ -24,4 +24,9 @@ export const queryKeys = {
     status: (postId: string, userId: string) =>
       [...queryKeys.likes.statuses(), postId, userId] as const,
   },
+  users: {
+    all: ["users"] as const,
+    details: () => [...queryKeys.users.all, "detail"] as const,
+    detail: (uid: string) => [...queryKeys.users.details(), uid] as const,
+  },
 };

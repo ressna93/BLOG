@@ -1,23 +1,30 @@
-import { memo } from "react";
-import { Link } from "react-router-dom";
+import { memo, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import type { PostSummary } from "@/types";
 import { CATEGORY_LABELS } from "@/types";
-import { getPostDetailPath } from "@/constants";
+import { getPostDetailPath, getProfilePath } from "@/constants";
 import { formatDateShort, getDisplayName } from "@/utils/formatters";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import LikeButton from "./LikeButton";
 
 interface PostCardProps {
   post: PostSummary;
 }
 
 const PostCard = memo(function PostCard({ post }: PostCardProps) {
+  const navigate = useNavigate();
+
+  const handleCardClick = useCallback(() => {
+    navigate(getPostDetailPath(post.id));
+  }, [navigate, post.id]);
+
   return (
-    <Card className="transition-colors hover:bg-muted/50">
-      <Link
-        to={getPostDetailPath(post.id)}
-        className="flex flex-col sm:flex-row gap-4"
-      >
+    <Card
+      className="transition-colors hover:bg-muted/50 cursor-pointer"
+      onClick={handleCardClick}
+    >
+      <div className="flex flex-col sm:flex-row gap-4">
         <CardContent className="flex-1 min-w-0">
           {post.category && (
             <Badge variant="secondary" className="mb-3">
@@ -30,11 +37,17 @@ const PostCard = memo(function PostCard({ post }: PostCardProps) {
           </h2>
 
           <div className="flex items-center text-sm text-muted-foreground gap-2">
-            <span>
+            <Link
+              to={getProfilePath(post.authorId)}
+              className="hover:underline"
+              onClick={(e) => e.stopPropagation()}
+            >
               {getDisplayName(post.authorEmail, post.authorDisplayName)}
-            </span>
+            </Link>
             <span>·</span>
             <span>{formatDateShort(post.createdAt)}</span>
+            <span>·</span>
+            <LikeButton postId={post.id} likeCount={post.likeCount} size="sm" />
           </div>
         </CardContent>
 
@@ -47,7 +60,7 @@ const PostCard = memo(function PostCard({ post }: PostCardProps) {
             />
           </div>
         )}
-      </Link>
+      </div>
     </Card>
   );
 });
