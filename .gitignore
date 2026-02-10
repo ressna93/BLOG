@@ -15,8 +15,10 @@ dist-ssr
 # 환경 변수 (민감한 정보)
 .env
 .env.local
+
 docs
 *copy*
+
 
 # Editor directories and files
 .vscode/*

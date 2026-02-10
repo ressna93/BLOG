@@ -8,31 +8,31 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { getPostsWithOptions } from "@/lib/posts";
-import { queryKeys } from "./queriesKeys";
+import { queryKeys } from "./keys";
 import type { Category } from "@/types";
 
 interface UsePostsOptions {
-  category?: Category | null;
-  enabled?: boolean;
+    category?: Category | null;
+    enabled?: boolean;
 }
 
 export function usePosts(options: UsePostsOptions = {}) {
-  const { category = null, enabled = true } = options;
+    const { category = null, enabled = true } = options;
 
-  return useQuery({
-    // 쿼리 키: 카테고리에 따라 다른 캐시 사용
-    queryKey: queryKeys.posts.list({ category }),
+    return useQuery({
+        // 쿼리 키: 카테고리에 따라 다른 캐시 사용
+        queryKey: queryKeys.posts.list({ category }),
 
-    // 데이터 페칭 함수
-    queryFn: async () => {
-      const result = await getPostsWithOptions({
-        category,
-        limitCount: 5,
-      });
-      return result.posts;
-    },
+        // 데이터 페칭 함수
+        queryFn: async () => {
+            const result = await getPostsWithOptions({
+                category,
+                limitCount: 5,
+            });
+            return result.posts;
+        },
 
-    // 쿼리 활성화 여부
-    enabled,
-  });
+        // 쿼리 활성화 여부
+        enabled,
+    });
 }
