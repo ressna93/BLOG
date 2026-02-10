@@ -16,7 +16,9 @@ dist-ssr
 .env
 .env.local
 
-docs
+docs/*
+!docs/screenshots/
+!docs/screenshots/**
 *copy*
 
 
